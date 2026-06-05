@@ -6,3 +6,6 @@ build/
 coverage/
 text.text
 npm-debug.log*
+node_modules/
+backend/.env
+frontend/AIExpenceTracker/.env
