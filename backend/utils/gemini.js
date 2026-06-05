@@ -1,11 +1,18 @@
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  buildFallbackInsight,
+  buildFallbackBudgetAlert,
+  buildFallbackSavingsTips,
+  buildFallbackTransactionAnalysis,
+  buildFallbackBudgetListAnalysis,
+} from "./geminiFallback.js";
 
 dotenv.config();
 
-const ai = new GoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+const ai = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })
+  : null;
 
 if (!process.env.GEMINI_API_KEY) {
   console.error(
@@ -35,6 +42,17 @@ export const generateMonthlyInsight = async ({
   previousMonths,
   currency = "USD",
 }) => {
+  // Gemini key is present but may be invalid; we still fall back on errors.
+  if (!ai) {
+    return buildFallbackTransactionAnalysis({ transactions, currency });
+  }
+
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "AI analysis is not configured. Please set the GEMINI_API_KEY environment variable."
+    );
+  }
+
   const breakdownText =
     expenseBreakdown.length > 0
       ? expenseBreakdown
@@ -93,6 +111,17 @@ Return ONLY valid JSON:
 }
 `;
 
+  if (!ai) {
+    return buildFallbackInsight({
+      currency,
+      totalIncome,
+      totalExpenses,
+      savingsRate,
+      expenseBreakdown,
+      previousMonths,
+    });
+  }
+
   try {
     const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
@@ -101,14 +130,15 @@ Return ONLY valid JSON:
 
     return JSON.parse(cleaned);
   } catch (error) {
-    console.error(
-      "Gemini API error (monthly insight):",
-      error
-    );
-
-    throw new Error(
-      "Failed to generate monthly insight. Please try again."
-    );
+    console.error("Gemini API error (monthly insight):", error);
+    return buildFallbackInsight({
+      currency,
+      totalIncome,
+      totalExpenses,
+      savingsRate,
+      expenseBreakdown,
+      previousMonths,
+    });
   }
 };
 
@@ -120,6 +150,12 @@ export const generateBudgetAlert = async ({
   totalPeriodDays,
   currency = "USD",
 }) => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "AI analysis is not configured. Please set the GEMINI_API_KEY environment variable."
+    );
+  }
+
   const percentUsed = (
     (spentAmount / budgetAmount) *
     100
@@ -151,6 +187,17 @@ Return ONLY valid JSON:
 }
 `;
 
+  if (!ai) {
+    return buildFallbackBudgetAlert({
+      categoryName,
+      budgetAmount,
+      spentAmount,
+      daysIntoPeriod,
+      totalPeriodDays,
+      currency,
+    });
+  }
+
   try {
     const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
@@ -159,14 +206,15 @@ Return ONLY valid JSON:
 
     return JSON.parse(cleaned);
   } catch (error) {
-    console.error(
-      "Gemini API error (budget alert):",
-      error
-    );
-
-    throw new Error(
-      "Failed to generate budget alert."
-    );
+    console.error("Gemini API error (budget alert):", error);
+    return buildFallbackBudgetAlert({
+      categoryName,
+      budgetAmount,
+      spentAmount,
+      daysIntoPeriod,
+      totalPeriodDays,
+      currency,
+    });
   }
 };
 
@@ -175,6 +223,20 @@ export const generateSavingsTips = async ({
   monthlyIncome,
   currency = "USD",
 }) => {
+  if (!ai) {
+    return buildFallbackSavingsTips({
+      topCategories,
+      monthlyIncome,
+      currency,
+    });
+  }
+
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "AI analysis is not configured. Please set the GEMINI_API_KEY environment variable."
+    );
+  }
+
   const categoryText =
     topCategories.length > 0
       ? topCategories
@@ -224,9 +286,12 @@ Return ONLY valid JSON:
       error
     );
 
-    throw new Error(
-      "Failed to generate savings tips."
-    );
+    console.warn("Falling back to basic savings tips due to API error");
+    return buildFallbackSavingsTips({
+      topCategories,
+      monthlyIncome,
+      currency,
+    });
   }
 };
 
@@ -234,6 +299,12 @@ export const analyzeTransactionList = async ({
   transactions,
   currency = "USD",
 }) => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "AI analysis is not configured. Please set the GEMINI_API_KEY environment variable."
+    );
+  }
+
   const lines = transactions
     .slice(0, 50)
     .map((t) => {
@@ -262,14 +333,8 @@ Return ONLY valid JSON:
 
     return JSON.parse(cleaned);
   } catch (error) {
-    console.error(
-      "Gemini API error (transactions):",
-      error
-    );
-
-    throw new Error(
-      "Failed to analyze transactions."
-    );
+    console.error("Gemini API error (transactions):", error);
+    return buildFallbackTransactionAnalysis({ transactions, currency });
   }
 };
 
@@ -277,6 +342,12 @@ export const analyzeBudgetList = async ({
   budgets,
   currency = "USD",
 }) => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "AI analysis is not configured. Please set the GEMINI_API_KEY environment variable."
+    );
+  }
+
   const lines = budgets
     .map((b) => {
       const spent = Number(b.spent);
@@ -317,14 +388,8 @@ Return ONLY valid JSON:
 
     return JSON.parse(cleaned);
   } catch (error) {
-    console.error(
-      "Gemini API error (budgets):",
-      error
-    );
-
-    throw new Error(
-      "Failed to analyze budgets."
-    );
+    console.error("Gemini API error (budgets):", error);
+    return buildFallbackBudgetListAnalysis({ budgets, currency });
   }
 };
 

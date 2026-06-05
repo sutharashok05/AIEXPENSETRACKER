@@ -433,6 +433,13 @@ export const analyzeTransactions = async (req, res) => {
     });
   }
 
+  // Check if Gemini API is configured
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({
+      message: "AI analysis is not available. Please configure GEMINI_API_KEY in the server environment.",
+    });
+  }
+
   const ids = transactionIds.slice(0, 50);
 
   try {
