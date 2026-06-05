@@ -1,0 +1,57 @@
+step to get this token
+Step 1: Login
+Send a POST request:
+POST http://localhost:8000/api/auth/login
+
+Body:
+
+{
+  "email": "ashok@gmail.com",
+  "password": "123456"
+}
+
+Step 2: Copy the Token
+
+The response will look like:
+
+{
+  "user": {
+    "id": 1,
+    "name": "Ashok",
+    "email": "ashok@gmail.com",
+    "currency": "USD"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc4MDU0NzQ4MiwiZXhwIjoxNzgxMTUyMjgyfQ.GXOX8fUcQunHINUjQDRsHBo6mwMsBIcWpjk8Zvqe65I"
+}
+
+Step 3: Use the Token
+
+For protected routes (/api/auth/me, /api/categories, /api/transactions), add a header:
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+In Thunder Client
+Option 1 (Recommended)
+Open the Auth tab.
+Select Bearer Token.
+Paste only the token:
+
+
+Before Testing Dashboard
+
+You should already have:
+
+Login
+POST http://localhost:8000/api/auth/login
+
+Body:
+
+{
+  "email": "ashok@gmail.com",
+  "password": "123456"
+}
+
+Copy the token from the response.
+
+Authorization Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc4MDU0NzQ4MiwiZXhwIjoxNzgxMTUyMjgyfQ.GXOX8fUcQunHINUjQDRsHBo6mwMsBIcWpjk8Zvqe65I
+Email: alex@timetoprogram.com
+Password: Test@1234
