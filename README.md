@@ -1,6 +1,6 @@
 # AI Expense Tracker
 
-An AI-powered Expense Tracking Application built with React, Node.js, Express, PostgreSQL (Neon), JWT Authentication, and Google Gemini AI.
+An AI-powered personal finance management application that helps users track expenses, manage budgets, analyze spending patterns, and generate intelligent financial insights using Google Gemini AI.
 
 ---
 
@@ -13,39 +13,42 @@ An AI-powered Expense Tracking Application built with React, Node.js, Express, P
 * JWT Authentication
 * Protected Routes
 
-### Expense Management
-
-* Add Transactions
-* Update Transactions
-* Delete Transactions
-* Transaction History
-
-### Categories
+### Category Management
 
 * Create Categories
 * Update Categories
 * Delete Categories
-* Default Categories
+* Default Categories Automatically Created
+
+### Transaction Management
+
+* Add Income Transactions
+* Add Expense Transactions
+* Edit Transactions
+* Delete Transactions
+* Search & Filter Transactions
 
 ### Budget Management
 
 * Monthly Budgets
+* Weekly Budgets
 * Budget Tracking
 * Budget Alerts
 
 ### Dashboard Analytics
 
-* Monthly Income
-* Monthly Expenses
+* Total Income
+* Total Expenses
 * Savings Rate
+* Monthly Trend Analysis
 * Category Breakdown
-* Monthly Trends
+* Spending Statistics
 
 ### AI Features (Google Gemini)
 
 * Monthly Financial Insights
-* Spending Analysis
 * Budget Analysis
+* Transaction Analysis
 * Personalized Savings Tips
 * Smart Budget Alerts
 
@@ -66,66 +69,56 @@ An AI-powered Expense Tracking Application built with React, Node.js, Express, P
 
 * Node.js
 * Express.js
-* PostgreSQL
-* JWT
-* bcrypt
+* JWT Authentication
+* bcryptjs
 * dotenv
+
+## Database
+
+* PostgreSQL
+* Neon Database
 
 ## AI
 
 * Google Gemini API
 
-## Database
-
-* Neon PostgreSQL
-
 ---
 
 # Project Structure
 
-AIEXPENSETRACKER/
-
-├── backend/
-
-│ ├── controllers/
-
-│ ├── middleware/
-
-│ ├── routes/
-
-│ ├── scripts/
-
-│ ├── sql/
-
-│ ├── utils/
-
-│ ├── db.js
-
-│ └── server.js
-
+```text
+AIEXPENSETRACKER
 │
-
-├── frontend/
-
-│ └── AIExpenceTracker/
-
-│ ├── src/
-
-│ ├── public/
-
-│ └── vite.config.js
-
+├── backend
+│   ├── controllers
+│   ├── middleware
+│   ├── routes
+│   ├── scripts
+│   ├── sql
+│   ├── utils
+│   ├── db.js
+│   ├── server.js
+│   └── .env
 │
-
-└── README.md
+├── frontend
+│   └── AIExpenceTracker
+│       ├── public
+│       ├── src
+│       ├── vite.config.js
+│       └── .env
+│
+├── README.md
+├── SETUP_GUIDE.md
+└── package.json
+```
 
 ---
 
 # Prerequisites
 
-Install the following before running the project:
+Install:
 
-## Node.js
+### Node.js
 
 Download:
 
@@ -138,7 +131,7 @@ node -v
 npm -v
 ```
 
-## Git
+### Git
 
 Download:
 
@@ -158,8 +151,6 @@ git --version
 git clone https://github.com/sutharashok05/AIEXPENSETRACKER.git
 ```
 
-Move into project:
-
 ```bash
 cd AIEXPENSETRACKER
 ```
@@ -174,7 +165,7 @@ Move into backend:
 cd backend
 ```
 
-Install packages:
+Install dependencies:
 
 ```bash
 npm install
@@ -182,25 +173,7 @@ npm install
 
 ---
 
-# Database Setup (Neon PostgreSQL)
-
-Create a free account:
-
-https://neon.tech
-
-Create a project.
-
-Copy Connection String.
-
-Example:
-
-```env
-postgresql://username:password@host.neon.tech/dbname?sslmode=require
-```
-
----
-
-# Backend Environment Variables
+# Create Backend Environment Variables
 
 Create:
 
@@ -222,41 +195,48 @@ GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 
 ---
 
-# Google Gemini Setup
+# Database Setup
 
-Go to:
+## Create Neon Database
 
-https://aistudio.google.com/
+1. Visit https://neon.tech
+2. Create an account
+3. Create a project
+4. Copy your PostgreSQL connection string
 
-Create API Key.
-
-Copy API Key.
-
-Add it to:
+Example:
 
 ```env
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+DATABASE_URL=postgresql://username:password@host.neon.tech/database?sslmode=require
 ```
 
 ---
 
-# Create Database Tables
-
-Run Migration:
+# Run Database Migration
 
 ```bash
 npm run migrate
 ```
 
+This creates all required tables:
+
+* users
+* categories
+* transactions
+* budgets
+* ai_insights
+
 ---
 
-# Seed Demo Data (Optional)
+# Optional Demo Data
+
+Generate sample user, categories, budgets, and transactions:
 
 ```bash
 npm run seed
 ```
 
-Demo Login:
+Demo User:
 
 ```json
 {
@@ -267,13 +247,37 @@ Demo Login:
 
 ---
 
+# Google Gemini Setup
+
+Visit:
+
+https://aistudio.google.com/app/apikey
+
+Create an API Key.
+
+Add it to:
+
+```env
+GEMINI_API_KEY=YOUR_API_KEY
+```
+
+Restart backend after updating:
+
+```bash
+npm start
+```
+
+---
+
 # Start Backend
+
+Development:
 
 ```bash
 npm run dev
 ```
 
-or
+Production:
 
 ```bash
 npm start
@@ -289,10 +293,10 @@ http://localhost:8000
 
 # Frontend Setup
 
-Move into frontend:
+Open new terminal:
 
 ```bash
-cd ../frontend/AIExpenceTracker
+cd frontend/AIExpenceTracker
 ```
 
 Install dependencies:
@@ -301,10 +305,14 @@ Install dependencies:
 npm install
 ```
 
+---
+
+# Frontend Environment Variables
+
 Create:
 
 ```text
-.env
+frontend/AIExpenceTracker/.env
 ```
 
 Add:
@@ -329,7 +337,7 @@ http://localhost:5173
 
 ---
 
-# Authentication Flow
+# Authentication
 
 Register:
 
@@ -347,59 +355,58 @@ Response:
 
 ```json
 {
-  "token": "YOUR_JWT_TOKEN"
+  "user": {
+    "id": 1,
+    "name": "Ashok"
+  },
+  "token": "JWT_TOKEN"
 }
 ```
 
-Store token:
-
-```javascript
-localStorage.setItem("token", token);
-```
-
-The frontend automatically sends:
+The frontend automatically stores the token in Local Storage and sends:
 
 ```http
-Authorization: Bearer YOUR_JWT_TOKEN
+Authorization: Bearer JWT_TOKEN
 ```
 
-for protected APIs.
+with every protected request.
 
 ---
 
-# Main APIs
+# Main API Endpoints
 
 ## Auth
 
 ```http
 POST /api/auth/register
 POST /api/auth/login
+GET  /api/auth/me
 ```
 
 ## Categories
 
 ```http
-GET /api/categories
-POST /api/categories
-PUT /api/categories/:id
+GET    /api/categories
+POST   /api/categories
+PUT    /api/categories/:id
 DELETE /api/categories/:id
 ```
 
 ## Transactions
 
 ```http
-GET /api/transactions
-POST /api/transactions
-PUT /api/transactions/:id
+GET    /api/transactions
+POST   /api/transactions
+PUT    /api/transactions/:id
 DELETE /api/transactions/:id
 ```
 
 ## Budgets
 
 ```http
-GET /api/budgets
-POST /api/budgets
-PUT /api/budgets/:id
+GET    /api/budgets
+POST   /api/budgets
+PUT    /api/budgets/:id
 DELETE /api/budgets/:id
 ```
 
@@ -414,42 +421,45 @@ GET /api/dashboard/monthly-trend
 ## AI Insights
 
 ```http
-GET /api/insights
-
+GET  /api/insights
 POST /api/insights/generate
-
 POST /api/insights/analyze-transactions
-
 POST /api/insights/analyze-budgets
 ```
 
 ---
 
-# Special Features
+# Security
 
 * JWT Authentication
-* PostgreSQL Database
-* Neon Cloud Database
-* Google Gemini AI Integration
-* Monthly Financial Insights
-* Savings Recommendations
+* Password Hashing (bcryptjs)
+* Protected APIs
+* Environment Variable Protection
+
+---
+
+# Special Features
+
+* AI Powered Financial Insights
 * Budget Monitoring
-* Spending Analysis
-* Responsive UI
-* Protected Routes
-* REST API Architecture
+* Savings Recommendations
+* Transaction Analysis
+* Monthly Financial Reports
+* Category Based Expense Tracking
+* Cloud Database (Neon)
+* Responsive User Interface
 
 ---
 
 # Future Improvements
 
-* PDF Reports
-* Export to Excel
 * Dark Mode
-* Multi-Currency Support
+* Export PDF Reports
+* Export Excel Reports
+* Multi Currency Support
 * Email Notifications
-* Recurring Transactions
 * Mobile Application
+* Recurring Transactions
 
 ---
 
@@ -458,5 +468,7 @@ POST /api/insights/analyze-budgets
 Ashok Suthar
 
 GitHub:
-
 https://github.com/sutharashok05
+
+Project Repository:
+https://github.com/sutharashok05/AIEXPENSETRACKER
